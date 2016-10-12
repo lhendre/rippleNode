@@ -1,5 +1,21 @@
 var express = require('express');
 var app = express();
+var cluster = require('cluster');
+var http = require('http');
+var numCPUs = 4;
+
+if(cluster.isMaster) {
+  for (var i = 0; i < numCPUs; i++) {
+    cluster.fork();
+}
+}else {
+    http.createServer(function(req, res) {
+        res.writeHead(200);
+        res.end('process ' + process.pid + ' says hello!');
+    }).listen(8000);
+ }
+
+
 
 var jsonSubscribe={
 "id": 2,
@@ -57,7 +73,7 @@ ws.on('message', function(data, flags) {
 app.get('/', function (req, res) {
   res.send('Hello World!');
 });
-
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
-});
+// 
+// app.listen(3000, function () {
+//   console.log('Example app listening on port 3000!');
+// });
